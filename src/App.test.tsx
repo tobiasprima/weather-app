@@ -1,10 +1,11 @@
 /* eslint-disable testing-library/no-unnecessary-act */
 /* eslint-disable testing-library/no-wait-for-multiple-assertions */
 import "@testing-library/jest-dom/extend-expect";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
 import { act } from "react";
+import { setTimeout } from "timers";
 import App from "./App";
 
 const mock = new MockAdapter(axios);
@@ -54,4 +55,46 @@ test("renders error message in App on failure", async () => {
       screen.getByText(/failed to fetch weather data/i)
     ).toBeInTheDocument();
   });
+});
+
+test("allows the user to input a city and fetch weather data", async () => {
+  mock
+    .onGet(
+      `https://api.openweathermap.org/data/2.5/weather?q=London&appid=${API_KEY}&units=metric`
+    )
+    .reply(200, {
+      main: { temp: 20 },
+      weather: [{ description: "Sunny", icon: "01d" }],
+    });
+
+  mock
+    .onGet(
+      `https://api.openweathermap.org/data/2.5/weather?q=Paris&appid=${API_KEY}&units=metric`
+    )
+    .reply(200, {
+      main: { temp: 25 },
+      weather: [{ description: "Clear", icon: "01d" }],
+    });
+
+  await act(async () => render(<App />));
+
+  // Initially, it should load weather for London
+  setTimeout(() => {
+    expect(screen.getByText("London")).toBeInTheDocument();
+    expect(screen.getByText("20°C")).toBeInTheDocument();
+    expect(screen.getByText("Sunny")).toBeInTheDocument();
+  }, 1000);
+
+  // Change the city to Paris
+  fireEvent.change(screen.getByPlaceholderText(/enter city name/i), {
+    target: { value: "Paris" },
+  });
+  fireEvent.click(screen.getByText(/get weather/i));
+
+  // Now it should load weather for Paris
+  setTimeout(() => {
+    expect(screen.getByText("Paris")).toBeInTheDocument();
+    expect(screen.getByText("25°C")).toBeInTheDocument();
+    expect(screen.getByText("Clear")).toBeInTheDocument();
+  }, 1000);
 });
