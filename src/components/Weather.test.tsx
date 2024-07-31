@@ -15,9 +15,9 @@ beforeAll(() => {
   process.env.REACT_APP_OPENWEATHER_API_KEY = API_KEY;
 });
 
-test("renders loading state initially", () => {
-  render(<Weather city="London" />);
-  expect(screen.getByText(/loading/i)).toBeInTheDocument();
+test("renders loading state initially", async () => {
+  await act(async () => render(<Weather city="London" />));
+  expect(screen.getByTestId("loader")).toBeInTheDocument();
 });
 
 test("renders weather data", async () => {

@@ -2,6 +2,8 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { WeatherData, WeatherProps, WeatherResponse } from "../types";
+import Loading from "./Loading";
+import Modal from "./Modal";
 
 const API_KEY = process.env.REACT_APP_OPENWEATHER_API_KEY;
 
@@ -15,10 +17,37 @@ const WeatherContainer = styled.div`
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 `;
 
+const CityName = styled.h1`
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+`;
+
+const WeatherIcon = styled.img`
+  width: 100px;
+  height: 100px;
+`;
+
+const Temperature = styled.p`
+  font-size: 20px;
+  margin: 5px 0;
+`;
+
+const Description = styled.p`
+  font-size: 16px;
+  color: #757575;
+  margin: 5px 0;
+`;
+
 const Weather: React.FC<WeatherProps> = ({ city }) => {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  const handleCloseModal = () => {
+    setError(null);
+    setWeather(null);
+  };
 
   useEffect(() => {
     const fetchWeather = async () => {
@@ -43,21 +72,32 @@ const Weather: React.FC<WeatherProps> = ({ city }) => {
   }, [city]);
 
   if (loading) {
-    return <WeatherContainer>Loading ...</WeatherContainer>;
+    return (
+      <WeatherContainer>
+        <Loading />
+      </WeatherContainer>
+    );
   }
 
   if (error) {
-    return <WeatherContainer>{error}</WeatherContainer>;
+    return (
+      <>
+        <WeatherContainer>
+          <Loading />
+        </WeatherContainer>
+        <Modal message={error} onClose={handleCloseModal} />
+      </>
+    );
   }
 
   return (
     <WeatherContainer>
       {weather ? (
         <>
-          <h1 className="text-2xl font-bold">{city}</h1>
-          <img src={weather.icon} alt={weather.description} />
-          <p className="text-xl">{weather.temperature}°C</p>
-          <p className="text-sm">{weather.description}</p>
+          <CityName>{city}</CityName>
+          <WeatherIcon src={weather.icon} alt={weather.description} />
+          <Temperature>{weather.temperature}°C</Temperature>
+          <Description>{weather.description}</Description>
         </>
       ) : (
         <p>No data</p>
