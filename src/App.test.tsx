@@ -32,6 +32,7 @@ test("renders weather data in App", async () => {
 
   await act(async () => render(<App />));
   setTimeout(() => {
+    // Give delay for the DOM to be rendered
     expect(screen.getByText("London")).toBeInTheDocument();
     expect(screen.getByText("20°C")).toBeInTheDocument();
     expect(screen.getByText("Sunny")).toBeInTheDocument();
