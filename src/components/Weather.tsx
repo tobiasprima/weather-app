@@ -2,6 +2,8 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 
+const API_KEY = process.env.REACT_APP_OPENWEATHER_API_KEY;
+
 interface WeatherProps {
   city: string;
 }
@@ -23,8 +25,6 @@ const WeatherContainer = styled.div`
 `;
 
 const Weather: React.FC<WeatherProps> = ({ city }) => {
-  const API_KEY = process.env.REACT_APP_OPENWEATHER_API_KEY;
-
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
