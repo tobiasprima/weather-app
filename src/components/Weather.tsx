@@ -1,18 +1,9 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import { WeatherData, WeatherProps, WeatherResponse } from "../types";
 
 const API_KEY = process.env.REACT_APP_OPENWEATHER_API_KEY;
-
-interface WeatherProps {
-  city: string;
-}
-
-interface WeatherData {
-  temperature: number;
-  description: string;
-  icon: string;
-}
 
 const WeatherContainer = styled.div`
   display: flex;
@@ -32,13 +23,13 @@ const Weather: React.FC<WeatherProps> = ({ city }) => {
   useEffect(() => {
     const fetchWeather = async () => {
       try {
-        const response = axios.get(
+        const response = await axios.get<WeatherResponse>(
           `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`
         );
-        const data = (await response).data;
+        const data = response.data;
         setWeather({
-          temperature: data.main.temp,
-          description: data.weather[0].description,
+          temperature: data.main?.temp ?? 0,
+          description: data.weather?.[0]?.description ?? "No Description",
           icon: `http://openweathermap.org/img/wn/${data.weather[0].icon}.png`,
         });
         setLoading(false);

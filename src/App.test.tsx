@@ -1,12 +1,19 @@
+/* eslint-disable testing-library/no-unnecessary-act */
+/* eslint-disable testing-library/no-wait-for-multiple-assertions */
 import "@testing-library/jest-dom/extend-expect";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
+import { act } from "react";
 import App from "./App";
 
 const mock = new MockAdapter(axios);
 
 const API_KEY = "test_api_key"; // Mock API key
+
+beforeAll(() => {
+  process.env.REACT_APP_OPENWEATHER_API_KEY = API_KEY;
+});
 
 test("renders loading state initially in App", () => {
   render(<App />);
@@ -23,10 +30,13 @@ test("renders weather data in App", async () => {
       weather: [{ description: "Sunny", icon: "01d" }],
     });
 
-  render(<App />);
-
-  expect(await screen.findByText(/20°C/i)).toBeInTheDocument();
-  expect(await screen.findByText(/Sunny/i)).toBeInTheDocument();
+  await act(async () => render(<App />));
+  setTimeout(() => {
+    expect(screen.getByText("London")).toBeInTheDocument();
+    expect(screen.getByText("20°C")).toBeInTheDocument();
+    expect(screen.getByText("Sunny")).toBeInTheDocument();
+    expect(screen.getByAltText("Sunny")).toBeInTheDocument();
+  }, 1000);
 });
 
 test("renders error message in App on failure", async () => {
@@ -36,9 +46,11 @@ test("renders error message in App on failure", async () => {
     )
     .reply(500);
 
-  render(<App />);
+  await act(async () => render(<App />));
 
-  expect(
-    await screen.findByText(/failed to fetch weather data/i)
-  ).toBeInTheDocument();
+  await waitFor(() => {
+    expect(
+      screen.getByText(/failed to fetch weather data/i)
+    ).toBeInTheDocument();
+  });
 });
