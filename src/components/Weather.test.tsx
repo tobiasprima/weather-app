@@ -12,9 +12,10 @@ test("renders loading state initially", () => {
 });
 
 test("renders weather data", async () => {
+  // Mocking here don't need real API KEY
   mock
     .onGet(
-      "https://api.openweathermap.org/data/2.5/weather?q=London&appid=YOUR_API_KEY&units=metric"
+      "https://api.openweathermap.org/data/2.5/weather?q=London&appid=API_KEY&units=metric"
     )
     .reply(200, {
       main: { temp: 20 },
@@ -28,9 +29,10 @@ test("renders weather data", async () => {
 });
 
 test("renders error message on failure", async () => {
+  // Mocking here don't need real API KEY
   mock
     .onGet(
-      "https://api.openweathermap.org/data/2.5/weather?q=London&appid=YOUR_API_KEY&units=metric"
+      "https://api.openweathermap.org/data/2.5/weather?q=London&appid=API_KEY&units=metric"
     )
     .reply(500);
 
