@@ -44,5 +44,14 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.(js|ts)$": "babel-jest"
+    },
+    "transformIgnorePatterns": []
+  },
+  "devDependencies": {
+    "axios-mock-adapter": "^1.22.0"
   }
 }
