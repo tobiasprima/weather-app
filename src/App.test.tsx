@@ -8,10 +8,6 @@ const mock = new MockAdapter(axios);
 
 const API_KEY = "test_api_key"; // Mock API key
 
-beforeAll(() => {
-  process.env.REACT_APP_OPENWEATHER_API_KEY = API_KEY;
-});
-
 test("renders loading state initially in App", () => {
   render(<App />);
   expect(screen.getByText(/loading/i)).toBeInTheDocument();
