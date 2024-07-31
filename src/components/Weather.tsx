@@ -2,6 +2,8 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { WeatherData, WeatherProps, WeatherResponse } from "../types";
+import Loading from "./Loading";
+import Modal from "./Modal";
 
 const API_KEY = process.env.REACT_APP_OPENWEATHER_API_KEY;
 
@@ -37,15 +39,15 @@ const Description = styled.p`
   margin: 5px 0;
 `;
 
-const ErrorText = styled.p`
-  color: red;
-  font-size: 16px;
-`;
-
 const Weather: React.FC<WeatherProps> = ({ city }) => {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  const handleCloseModal = () => {
+    setError(null);
+    setWeather(null);
+  };
 
   useEffect(() => {
     const fetchWeather = async () => {
@@ -70,14 +72,21 @@ const Weather: React.FC<WeatherProps> = ({ city }) => {
   }, [city]);
 
   if (loading) {
-    return <WeatherContainer>Loading ...</WeatherContainer>;
+    return (
+      <WeatherContainer>
+        <Loading />
+      </WeatherContainer>
+    );
   }
 
   if (error) {
     return (
-      <WeatherContainer>
-        <ErrorText>{error}</ErrorText>
-      </WeatherContainer>
+      <>
+        <WeatherContainer>
+          <Loading />
+        </WeatherContainer>
+        <Modal message={error} onClose={handleCloseModal} />
+      </>
     );
   }
 

@@ -16,9 +16,9 @@ beforeAll(() => {
   process.env.REACT_APP_OPENWEATHER_API_KEY = API_KEY;
 });
 
-test("renders loading state initially in App", () => {
-  render(<App />);
-  expect(screen.getByText(/loading/i)).toBeInTheDocument();
+test("renders loading state initially in App", async () => {
+  await act(async () => render(<App />));
+  expect(screen.getByTestId("loader")).toBeInTheDocument();
 });
 
 test("renders weather data in App", async () => {
@@ -41,7 +41,7 @@ test("renders weather data in App", async () => {
   }, 1000);
 });
 
-test("renders error message in App on failure", async () => {
+test("renders error modal in Weather on failure", async () => {
   mock
     .onGet(
       `https://api.openweathermap.org/data/2.5/weather?q=London&appid=${API_KEY}&units=metric`
@@ -54,6 +54,14 @@ test("renders error message in App on failure", async () => {
     expect(
       screen.getByText(/failed to fetch weather data/i)
     ).toBeInTheDocument();
+  });
+
+  fireEvent.click(screen.getByText(/close/i));
+
+  await waitFor(() => {
+    expect(
+      screen.queryByText(/failed to fetch weather data/i)
+    ).not.toBeInTheDocument();
   });
 });
 
